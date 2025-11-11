@@ -1,15 +1,53 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Route {
+  id              String  @id @default(cuid())
+  routeId         String  @unique
+  vesselType      String
+  fuelType        String
+  year            Int
+  ghgIntensity    Float
+  fuelTons        Float
+  distanceKm      Float
+  totalEmissionsT Float
+  isBaseline      Boolean @default(false)
+}
+
+model ShipCompliance {
+  id        String   @id @default(cuid())
+  shipId    String
+  year      Int
+  cb        Float
+  createdAt DateTime @default(now())
+}
+
+model BankEntry {
+  id        String   @id @default(cuid())
+  shipId    String
+  year      Int
+  amount    Float
+  createdAt DateTime @default(now())
+}
+
+model Pool {
+  id        String       @id @default(cuid())
+  year      Int
+  createdAt DateTime     @default(now())
+  members   PoolMember[]
+}
+
+model PoolMember {
+  id       String @id @default(cuid())
+  poolId   String
+  shipId   String
+  cbBefore Float
+  cbAfter  Float
+  pool     Pool   @relation(fields: [poolId], references: [id])
 }
